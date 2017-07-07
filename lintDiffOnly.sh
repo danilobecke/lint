@@ -15,7 +15,7 @@ if [ -n "$RULES" ]; then
 fi
 
 mkdir to-lint
-git status -s | grep -v " D" | cut -b4- | egrep '\.swift' | while read filename; do
+git status -s | grep -v " D" | grep -v ".yml" | cut -b4- | egrep '\.swift' | while read filename; do
 	cp $filename to-lint 
 done
 
