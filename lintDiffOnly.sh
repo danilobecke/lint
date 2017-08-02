@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# .swiftlint.yml backup
+if [ -e .swiftlint.yml ]
+then
+	VAR="$(date +'%m-%d-%Y').swiftlint.yml"
+	mv .swiftlint.yml $VAR 
+fi
+
+# get options: -i rule_do_disable
 while getopts i: option; do
 	case "$option" in
 		i) RULES+=("$OPTARG");;
@@ -14,6 +22,7 @@ if [ -n "$RULES" ]; then
 	echo "${TO_EXCLUDE}" >> .swiftlint.yml
 fi
 
+# files to lint
 mkdir to-lint
 git status -s | grep -v " D" | grep -v ".yml" | cut -b4- | egrep '\.swift' | while read filename; do
 	cp $filename to-lint 
@@ -25,5 +34,17 @@ if find to-lint -mindepth 1 -print -quit | grep -q .; then
 else
 	echo "Lint didn't find any file"
 fi
-rm .swiftlint.yml
+
+# remove disabled rules
+if [ -e .swiftlint.yml ]
+then
+	rm .swiftlint.yml
+fi
+
+# retrieve .swiftlint.yml
+if [ -n "${VAR}" ]
+then
+	mv $VAR .swiftlint.yml
+fi
+
 rm -rf to-lint
